@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+#set( $dollar = '$' )
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>${groupId}</groupId>
+    <artifactId>${rootArtifactId}</artifactId>
+    <version>${version}</version>
+  </parent>
+
+  <artifactId>${artifactId}</artifactId>
+  <packaging>war</packaging>
+
+  <prerequisites>
+    <maven>${mavenVersion}</maven>
+  </prerequisites>
+
+  <dependencies>
+
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>${rootArtifactId}-shared</artifactId>
+      <version>${version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>${rootArtifactId}-shared</artifactId>
+      <version>${version}</version>
+      <classifier>sources</classifier>
+    </dependency>    
+    <dependency>
+      <groupId>com.google.gwt</groupId>
+      <artifactId>gwt-servlet</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>javax.servlet-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.google.appengine</groupId>
+      <artifactId>appengine-api-1.0-sdk</artifactId>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>     
+      <plugin>
+        <groupId>com.google.appengine</groupId>
+        <artifactId>appengine-maven-plugin</artifactId>
+        <version>${gae.version}</version>
+        <configuration>
+          <version>${gae.app.instance.version}</version>  <!-- common configuration -->
+          <port>8080</port>
+        </configuration>
+      </plugin>
+    </plugins>  
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.tomcat.maven</groupId>
+          <artifactId>tomcat7-maven-plugin</artifactId>
+          <configuration>
+            <addWarDependenciesInClassloader>false</addWarDependenciesInClassloader>
+            <path>/</path>
+            <uriEncoding>UTF-8</uriEncoding>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+
+  <profiles>
+    <profile>
+      <!-- XXX: We want to exclude ${rootArtifactId}-client from 'env-dev' 
+        profile, Maven forces us to make a 'env-prod' profile -->
+      <id>env-prod</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <dependencies>
+        <dependency>
+          <groupId>${project.groupId}</groupId>
+          <artifactId>${rootArtifactId}-client</artifactId>
+          <version>${version}</version>
+          <type>war</type>
+          <scope>runtime</scope>
+        </dependency>
+      </dependencies>
+    </profile>
+    <profile>
+      <id>env-dev-gae-nolisten</id>
+      <activation>
+        <property>
+          <name>env</name>
+          <value>dev-gae-nolisten</value>
+        </property>
+      </activation>
+    </profile>
+    <profile>
+      <id>env-dev-gae</id>
+      <activation>
+        <property>
+          <name>env</name>
+          <value>dev-gae</value>
+        </property>
+      </activation>
+      <build>
+        <pluginManagement>
+        <plugins>
+          <plugin>
+            <groupId>com.google.appengine</groupId>
+            <artifactId>appengine-maven-plugin</artifactId>
+            <configuration>
+              <jvmFlags>
+                <jvmFlag>-Xdebug</jvmFlag>
+                <jvmFlag>-Xrunjdwp:transport=dt_socket,address=1044,server=y,suspend=y
+                </jvmFlag>
+              </jvmFlags>
+              <disableUpdateCheck>true</disableUpdateCheck>
+            </configuration>
+          </plugin>
+        </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+    <profile>
+      <id>env-dev-tomcat-nocodeserver</id>
+      <activation>
+        <property>
+          <name>env</name>
+          <value>dev-tomcat-nocodeserver</value>
+        </property>
+      </activation>
+    </profile>
+    <profile>
+      <id>env-dev-tomcat</id>
+      <activation>
+        <property>
+          <name>env</name>
+          <value>dev-tomcat</value>
+        </property>
+      </activation>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.apache.tomcat.maven</groupId>
+              <artifactId>tomcat7-maven-plugin</artifactId>
+              <configuration>
+                <contextFile>${basedir}/src/main/tomcatconf/context.xml</contextFile>
+                <systemProperties>
+                  <gwt.codeserver.port>9876</gwt.codeserver.port>
+                </systemProperties>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+  </profiles>
+</project>

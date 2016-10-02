@@ -1,0 +1,9 @@
+#set( $symbol_pound = '#' )
+#set( $symbol_dollar = '$' )
+#set( $symbol_escape = '\' )
+<?xml version="1.0" encoding="UTF-8"?>
+	<!-- reloadable="true" causes tomcat to reload installed version of shared code (from jar afaict)-->
+<Context reloadable="false">
+  <Resources className="org.apache.naming.resources.VirtualDirContext"
+    extraResourcePaths="/=${symbol_dollar}{basedir}/../target/gwt/launcherDir/" />
+</Context>
