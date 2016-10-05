@@ -91,11 +91,11 @@
       </dependencies>
     </profile>
     <profile>
-      <id>env-dev-gae-nolisten</id>
+      <id>env-dev-gae-no-debug</id>
       <activation>
         <property>
           <name>env</name>
-          <value>dev-gae-nolisten</value>
+          <value>dev-gae-no-debug</value>
         </property>
       </activation>
     </profile>
